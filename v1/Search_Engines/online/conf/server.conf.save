@@ -1,0 +1,14 @@
+invertIndexLib.dat ../data/invertIndexLib.dat
+webOffsetLib.dat ../data/webOffsetLib.dat
+webPageLib.dat ../data/webPageLib.dat
+eng_dict.dat ../data/eng_dict.dat
+eng_index.dat ../data/eng_index.dat
+chi_dict.dat ../data/chi_dict.dat
+chi_index.dat ../data/chi_index.dat
+ip 127.0.0.1
+port 6379
+DICT_PATH      ../include/include/cppjieba/dict/jieba.dict.utf8
+HMM_PATH       ../include/include/cppjieba/dict/hmm_model.utf8
+USER_DICT_PATH ../include/include/cppjieba/dict/user.dict.utf8
+stop_words_zh.txt ../data/stop_words_zh.txt
+cache_data.dat ../data/cache_data.dat
