@@ -36,7 +36,7 @@ void PageLibPreprocessor::cutRedundantPages()
 
 }
 
-// 季铭钊：建立倒排索引库
+// 建立倒排索引库
 void PageLibPreprocessor::buildInvertIndexTable()
 {
     map<string, int> word_allnumber;
@@ -164,7 +164,7 @@ void PageLibPreprocessor::buildInvertIndexTable()
     }
 }
 
-// 季铭钊：生成倒排索引库文件
+// ：生成倒排索引库文件
 void PageLibPreprocessor::GetInvertIndexTableFile(const string filename)
 {
     // 以写的方式发开filename路径所指的文件，并且判断文件是否可以打开
@@ -195,7 +195,7 @@ void PageLibPreprocessor::GetInvertIndexTableFile(const string filename)
     invertfile.close();
 }
 
-// 季铭钊：生成偏移量文件
+// ：生成偏移量文件
 void PageLibPreprocessor::GetOffSetLibFile(const string filename)
 {
       // 以写的方式发开filename路径所指的文件，并且判断文件是否可以打开
@@ -221,7 +221,7 @@ void PageLibPreprocessor::GetOffSetLibFile(const string filename)
     off_set_lib_file.close();
 }
 
-// 季铭钊：生成网页库文件
+// ：生成网页库文件
 void PageLibPreprocessor::GetWebPageLibFile(const string filename)
 { 
      // 以写的方式发开filename路径所指的文件，并且判断文件是否可以打开
@@ -260,8 +260,8 @@ void PageLibPreprocessor::GetWebPageLibFile(const string filename)
     web_page_file.close();
 }
 
-// 李金一：用于生成偏移量信息
-// 现阶段只是传入_file,后期使用接口获取vector<string>，和吉文瑞对接。
+// ：用于生成偏移量信息
+// 现阶段只是传入_file,后期使用接口获取vector<string>，对接。
 void PageLibPreprocessor::readInfoFormFiles()
 {
     int position = 0;
@@ -277,7 +277,7 @@ void PageLibPreprocessor::readInfoFormFiles()
     }
 }
 
-// 季铭钊：用于生成偏移量、倒排库、网页库文件
+// ：用于生成偏移量、倒排库、网页库文件
 void PageLibPreprocessor::storeOnDisk()
 {
     //将三个文件的文件地址传入，并且调用生成三个文件的相关函数（倒排索引库、偏移库、网页库）
@@ -289,18 +289,18 @@ void PageLibPreprocessor::storeOnDisk()
     GetWebPageLibFile(web_page_lib_filename);
 }
 
-// 季铭钊：构造函数
+// ：构造函数
 PageLibPreprocessor::PageLibPreprocessor(list<WebPage>& pages, Configuration_jieba &conf)
 : _cppJieba(conf)
 , l_webpage(pages) 
 {
-    //曾泽文：将网页库文章内容去重
+    //：将网页库文章内容去重
     cutRedundantPages();
-    //吉文锐：将去重的内容写入到_file内
+    //：将去重的内容写入到_file内
     vWebToString();
-    //李金一：生成文章偏移库
+    //：生成文章偏移库
     readInfoFormFiles();
-    //季铭钊：生成倒排索引库
+    //：生成倒排索引库
     buildInvertIndexTable();
 }
 

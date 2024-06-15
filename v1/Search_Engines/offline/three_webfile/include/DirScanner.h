@@ -1,5 +1,5 @@
-#ifndef WD_PROJECT_SEARCH_ENGINES_OFFLINE_THREE_WEBFILE_INCLUDE_DIRSCANNER_H_
-#define WD_PROJECT_SEARCH_ENGINES_OFFLINE_THREE_WEBFILE_INCLUDE_DIRSCANNER_H_
+#ifndef OLX_PROJECT_SEARCH_ENGINES_OFFLINE_THREE_WEBFILE_INCLUDE_DIRSCANNER_H_
+#define OLX_PROJECT_SEARCH_ENGINES_OFFLINE_THREE_WEBFILE_INCLUDE_DIRSCANNER_H_
 
 // Consider using <filesystem> for cross-platform compatibility (C++17)
 #include "../include/Configuration.h"
@@ -15,7 +15,7 @@ using std::vector;
 class DirScanner {
 public:
     DirScanner() {}
-
+    //第一个括号重载的是函数调用操作符 ()，第二个括号 () 是函数参数列表，这里参数为空而已，表示重载函数不接受任何参数
     void operator()() {
         Configuration& config = Configuration::getInstance("");  // Pass an empty string here as it doesn't affect the behavior
         map<string, string>& configMap = config.getConfigMap();
