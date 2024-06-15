@@ -117,58 +117,13 @@ char* MyTask::genRandomString(int length)       // 得到随机盐值
     return string;
 }
 
-json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg) {
-    json j;
-    MyRedis* redis = MyRedis::getInstance(conf);
-    string redisResult = redis->get(usrMsg);
-    cout << "Redis result: " << redisResult << endl;  // 添加调试信息
-
-    if (redisResult.empty()) {
-        // 缓存中没找到就走库搜索
-        WebPageQuery WebQuery(conf);
-
-        SplitToolCppJieba* pSplit = SplitToolCppJieba::getInstance(conf);
-
-        // 用户的消息进行分词
-        WebPageSearcher wps(usrMsg, *pSplit);
-        vector<string> wordList = wps.getWordList();
-
-        WebQuery.doQuery(wordList);
-
-        WebQuery.handleAbstract();
-
-        cout << "================" << endl;
-        WebQuery.generateJson();
-        j = WebQuery.getResult();
-        cout << "Query result: " << j.dump() << endl;  // 添加调试信息
-
-        // 把记录存储到redis中
-        redis->set(usrMsg, j.dump());
-    } else {
-        // 找到直接返回
-        try {
-            j = json::parse(redisResult);
-        } catch (const nlohmann::json::parse_error& e) {
-            cout << "JSON parse error: " << e.what() << endl;
-            // 可以根据需要处理错误，例如返回空的 JSON 对象或退出程序
-            return json::object();
-        }
-    }
-    pushHistory(name, usrMsg);
-    return j;
-}
-
-
-
-//有点问题暂存
-// json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg)
-// {
-//     // 网页搜索
+// json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg) {
 //     json j;
 //     MyRedis* redis = MyRedis::getInstance(conf);
 //     string redisResult = redis->get(usrMsg);
-//     if(redisResult == string())
-//     {
+//     cout << "Redis result: " << redisResult << endl;  // 添加调试信息
+
+//     if (redisResult.empty()) {
 //         // 缓存中没找到就走库搜索
 //         WebPageQuery WebQuery(conf);
 
@@ -185,17 +140,62 @@ json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg) {
 //         cout << "================" << endl;
 //         WebQuery.generateJson();
 //         j = WebQuery.getResult();
+//         cout << "Query result: " << j.dump() << endl;  // 添加调试信息
+
 //         // 把记录存储到redis中
 //         redis->set(usrMsg, j.dump());
-//     }
-//     else
-//     {
+//     } else {
 //         // 找到直接返回
-//         j = json::parse(redisResult);    
+//         try {
+//             j = json::parse(redisResult);
+//         } catch (const nlohmann::json::parse_error& e) {
+//             cout << "JSON parse error: " << e.what() << endl;
+//             // 可以根据需要处理错误，例如返回空的 JSON 对象或退出程序
+//             return json::object();
+//         }
 //     }
 //     pushHistory(name, usrMsg);
 //     return j;
 // }
+
+
+
+//有点问题暂存
+json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg)
+{
+    // 网页搜索
+    json j;
+    MyRedis* redis = MyRedis::getInstance(conf);
+    string redisResult = redis->get(usrMsg);
+    if(redisResult == string())
+    {
+        // 缓存中没找到就走库搜索
+        WebPageQuery WebQuery(conf);
+
+        SplitToolCppJieba* pSplit = SplitToolCppJieba::getInstance(conf);
+
+        // 用户的消息进行分词
+        WebPageSearcher wps(usrMsg, *pSplit);
+        vector<string> wordList = wps.getWordList();
+
+        WebQuery.doQuery(wordList);
+
+        WebQuery.handleAbstract();
+
+        cout << "================" << endl;
+        WebQuery.generateJson();
+        j = WebQuery.getResult();
+        // 把记录存储到redis中
+        redis->set(usrMsg, j.dump());
+    }
+    else
+    {
+        // 找到直接返回
+        j = json::parse(redisResult);    
+    }
+    pushHistory(name, usrMsg);
+    return j;
+}
 
 string MyTask::getUserHistoryJSON(const string& str){
     std::string json;
