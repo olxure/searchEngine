@@ -182,7 +182,7 @@ void EngDictProducer::storeIndex(const string& filename)
 
 int main(int argc, char* argv[])
 {
-    Configuration& conf = Configuration::getInstance(argv[1]);
+    Configuration& conf = Configuration::getInstance(argv[1]);//conf等于instance因为返回的是引用，都是类configuration的实例
 
     conf.readConfig();      // 读取配置文件
 
