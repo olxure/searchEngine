@@ -24,6 +24,7 @@ public:
     // Constructor
     PageLib(DirScanner& dirScanner)
         : _dirScanner(dirScanner), _fileNames(_dirScanner.getFiles()) {}
+        //getFiles()函数返回return _files;
 
     // Getter for file names
     vector<string>& getFiles() {
@@ -37,7 +38,7 @@ public:
 
 private:
     DirScanner& _dirScanner;
-    vector<string> _fileNames;
+    vector<string> _fileNames;//存储文件名的向量，_fileNames存的和files存的是一样的路径
     list<WebPage> _WebPage; // Use WebPage to store web information in list
 };
 
