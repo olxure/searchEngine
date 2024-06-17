@@ -324,80 +324,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// void runSearch(size_t sockfd, string& name) {
-//     while (true) {
-//         // 获取搜索方式
-//         std::cout << "Please select the method you want to search: [keyword(1)][webpage(2)][quit(0)]:";
-//         int choice;
-//         std::cin >> choice;
-//         if (std::cin.fail()) {
-//             std::cout << "-------Error: Please enter a number!-------" << std::endl;
-//             std::cin.clear();
-//             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//             continue;
-//         }
 
-//         if (choice == 1) { // keyword
-//             // 获取输入信息
-//             std::string line;
-//             std::cout << "Please enter your search: ";
-//             std::cin.ignore();  // 忽略之前的换行符
-//             std::getline(std::cin, line);
-//             if (std::cin.fail()) {
-//                 std::cout << "-------Error: Please enter a string!-------" << std::endl;
-//                 std::cin.clear();
-//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//                 continue;
-//             }
-//             train t1;
-//             t1.id = 1;
-//             t1.data = line;
-//             t1.len = line.length();
-
-//             // 转换为字节流
-//             using std::cout;
-//             using std::endl;
-//             size_t buffer_size = sizeof(t1.len) + sizeof(t1.id) + t1.data.length();
-//             cout << "buffer_size: " << buffer_size << endl;  // 添加调试信息
-
-//             char* buffer = new char[buffer_size + 1]();
-//             std::memcpy(buffer, &t1.len, sizeof(t1.len));
-//             std::memcpy(buffer + sizeof(t1.len), &t1.id, sizeof(t1.id));
-//             std::memcpy(buffer + sizeof(t1.len) + sizeof(t1.id), t1.data.c_str(), t1.data.length());
-
-//             buffer[buffer_size] = '\n';
-
-//             // 发送字节流
-//             if (send(sockfd, buffer, buffer_size + 1, 0) < 0) {
-//                 std::cout << "-------Error: Send failed!-------" << std::endl;
-//                 continue;
-//             }
-
-//             delete[] buffer;
-
-//             int len = 0;
-//             recv(sockfd, &len, sizeof(len), 0);
-//             char buf[len];
-//             memset(buf, 0, sizeof(buf));
-//             recv(sockfd, buf, len, 0);
-//             std::string Jsonstring(buf, len);
-
-//             cout << "jsonstring: " << Jsonstring << endl;  // 添加调试信息
-//             try {
-//                 nlohmann::json jsonData = nlohmann::json::parse(Jsonstring);
-//                 cout << endl;
-//                 for (const auto& val : jsonData) {
-//                     std::string stringValue = val;
-//                     std::cout << stringValue << std::endl;
-//                 }
-//                 cout << endl;
-//             } catch (const nlohmann::json::parse_error& e) {
-//                 std::cerr << "JSON parse error: " << e.what() << std::endl;
-//             }
-//         }
-//         // 其他选择的代码省略
-//     }
-// }
 
 //有点问题暂存调试
 void runSearch(size_t sockfd, string& name) {//用户进入搜索循环
@@ -557,36 +484,14 @@ void runSearch(size_t sockfd, string& name) {//用户进入搜索循环
 int printVersion(void) {
     std::cout << "\033[2J\033[1;1H";
 
-    printf("%s  ,----..                                   ___        ,---,.                                                       \n", COLOR_CYAN);
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(" /   /   \\                                ,--.'|_    ,'  .' |                         ,--,                          \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("|   :     :  __  ,-.                      |  | :,' ,---.'   |      ,---,            ,--.'|         ,---,            \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(".   |  ;. /,' ,'/ /|                      :  : ' : |   |   .'  ,-+-. /  |  ,----._,.|  |,      ,-+-. /  |           \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(".   ; /--` '  | |' | ,---.     ,--.--.  .;__,'  /  :   :  |-, ,--.'|'   | /   /  ' /`--'_     ,--.'|'   |   ,---.   \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(";   | ;    |  |   ,'/     \\   /       \\ |  |   |   :   |  ;/||   |  ,\"' ||   :     |,' ,'|   |   |  ,\"' |  /     \\  \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("|   : |    '  :  / /    /  | .--.  .-. |:__,'| :   |   :   .'|   | /  | ||   | .\\  .'  | |   |   | /  | | /    /  | \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(".   | '___ |  | ' .    ' / |  \\__\\/: . .  '  : |__ |   |  |-,|   | |  | |.   ; ';  ||  | :   |   | |  | |.    ' / | \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("'   ; : .'|;  : | '   ;   /|  ,\" .--.; |  |  | '.'|'   :  ;/||   | |  |/ '   .   . |'  : |__ |   | |  |/ '   ;   /| \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("'   | '/  :|  , ; '   |  / | /  /  ,.  |  ;  :    ;|   |    ||   | |--'   `---`-'| ||  | '.'||   | |--'  '   |  / | \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("|   :    /  ---'  |   :    |;  :   .'   \\ |  ,   / |   :   .'|   |/       .'__/\\_: |;  :    ;|   |/      |   :    | \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf(" \\   \\ .'          \\   \\  / |  ,     .-./  ---`-'  |   | ,'  '---'        |   :    :|  ,   / '---'        \\   \\  /  \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("  `---`             `----'   `--`---'              `----'                  \\   \\  /  ---`-'                `----'   \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
-    printf("                                                                            `--`-'                                  %s", COLOR_YELLOW);
-    printf("  version 1.0.0%s\n", COLOR_RESET);
+    printf("%s  _                   \n", COLOR_CYAN);
+    printf(" | |                  \n");
+    printf(" | |      _____  __  \n");
+    printf(" | |     / _ \\ \\/ / \n");
+    printf(" | |____|  __/>  <   \n");
+    printf(" |______|\\___/_/\\_\\ \n");
+    printf(" version 1.0.0%s\n", COLOR_YELLOW);
     return 0;
-
 }
 
 
