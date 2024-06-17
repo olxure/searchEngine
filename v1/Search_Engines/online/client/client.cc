@@ -15,48 +15,65 @@
 #define COLOR_YELLOW  "\x1b[33m"  // 黄色
 
 using namespace std;
-
+//定义两个结构体用于封装和解析数据，以便通过网络套接字进行传输，一个用于发送，一个用于接收
 typedef struct train_s {//传输文件协议（小火车）
-    int len;
-    int id;
-    std::string data;
+    int len;//数据长度
+    int id;// 数据ID，用于标识不同类型的数据（例如用户名、密码等）
+    std::string data;// 实际传输的数据
 } train;
+//这个结构体的作用是将要发送的数据封装成一个小火车（类似于数据包的概念），
+//包含数据的长度、数据的类型ID和实际的数据内容。这样在传输时，可以明确知道传输的数据的长度和类型，方便在接收时解析。
+//在发送用户名和密码时，将用户名和密码拼接成一个字符串，并封装到 train_s 结构体中，然后将整个结构体通过套接字发送
 
 typedef struct train_t{
-    int len;
-    std::string data;
+    int len;// 数据长度
+    std::string data;// 实际传输的数据
 }train_t;
+//这个结构体用于接收服务器返回的数据。它包含数据的长度和实际的数据内容。在接收数据时，先接收数据的长度，
+//然后根据长度接收实际的数据内容。这样可以处理变长的数据传输。
+//在接收服务器返回的登录结果时，先接收数据长度，再接收实际的数据内容，并封装到 train_t 结构体中，方便后续处理。
 
-void recvn(int sockfd, char buf[], int len)
+//函数recvn的作用是确保从套接字 sockfd 接收到指定长度的字节数 len，并将接收到的数据存储在缓冲区 buf 中。
+//它通过循环接收数据，直到接收到所需的字节数，sockfd->buf
+void recvn(int sockfd, char buf[], int len)//recvn是自定义函数，recv是POSIX库函数
 {
     int left = len;
     int ret = 0;
     while(left > 0)
     {
-        ret = recv(sockfd, buf, left, 0);
-        left -= ret;
-        buf += ret;
+        ret = recv(sockfd, buf, left, 0);//recv单次接收数据，返回实际接收到的字节数，可能少于请求的长度。
+        left -= ret;//left=len是函数传参需要传的总字节数，总left-ret成功收到的字节数=等于实际还要传的字节数
+        buf += ret;//用于更新缓冲区指针buf，使其指向下一个要存储数据的位置。
     }
 }
 
 void sendTrainNamePasswd(int sockfd, int id, string name, string passwd)//发送用户名和密码
 {
-    train_s train;
+    train_s train;//定义用于发送的结构体小火车
     train.data = name+passwd;
     train.len = name.size();
     train.id = id;
-    
-    size_t buffer_size = sizeof(train.len) + sizeof(train.id) + train.data.length();
-    
-    char* buffer = new char[buffer_size + 1]();
-    std::memcpy(buffer, &train.len, sizeof(train.len));
-    std::memcpy(buffer + sizeof(train.len), &train.id, sizeof(train.id));
-    std::memcpy(buffer + sizeof(train.len) + sizeof(train.id), train.data.c_str(), train.data.length());
+    //字节数+字节数+字符数，在 ASCII 编码的每个字符是 1 个字节，但utf8不是
+    size_t buffer_size = sizeof(train.len) + sizeof(train.id) + train.data.length();//4+4+字符串的长度，如abc就是4+4+3，不含\0
+    //std::string 类提供了一个名为 length 的成员函数，用于获取字符串的长度，即字符串中字符的数量（不包括末尾的空字符 \0）
+
+    //多分配了一个字节，用于存储换行符 \n。这个换行符被添加到缓冲区的最后一个字节，以确保数据发送到服务器时能够正确识别结束
+    char* buffer = new char[buffer_size + 1]();//为buffer多申请一个空间，存memcpy的\0或\n，保证是一个有效字符串
+
+    //// 1. 复制 train.len 到 buffer 的起始位置,复制的是&train.len存储的地址里的值4
+    std::memcpy(buffer, &train.len, sizeof(train.len));//void *memcpy(void *dest, const void *src, size_t n);
+    //04 00 00 00 是整数 4 的字节表示（假设小端字节序）
+
+    // 2. 复制 train.id 到 buffer 的偏移位置（在 train.len 之后）
+    std::memcpy(buffer + sizeof(train.len), &train.id, sizeof(train.id));//4+4+
+    //// 3. 复制 train.data 到 buffer 的偏移位置（在 train.len 和 train.id 之后）
+    std::memcpy(buffer + sizeof(train.len) + sizeof(train.id), train.data.c_str(), train.data.length());//
+    //
 
     /* cout << "buffer_size: " << buffer_size << endl; */
     /* cout << "buffer: " << buffer+8 << endl; */
     // 服务器是接收到换行才会停止
-    buffer[buffer_size] = '\n';
+    buffer[buffer_size] = '\n';// 4. 在 buffer 末尾添加换行符
 
     if (send(sockfd, buffer, buffer_size + 1, 0) < 0) {
         std::cout << "-------Error: Send failed!-------" << std::endl;
@@ -64,19 +81,25 @@ void sendTrainNamePasswd(int sockfd, int id, string name, string passwd)//发送
     delete [] buffer;
 }
 
+//train_t& recvTrain 是一个函数参数，它的类型是 train_t&，表示对 train_t 类型的对象的引用。
 void receiveTrainLogin(int sockfd, train_t& recvTrain)//接收服务端返回信息
 {
+    // 从套接字中接收数据长度并存储在 recvTrain.len 中
     if(recv(sockfd, &recvTrain.len, sizeof(int), 0) < 0)
     {
         cout << "-------Error: Receive failed!-------" << endl;
     }
-    int left = recvTrain.len;
-    int data;
-    if(recv(sockfd, &data, left, 0) < 0)
+    int left = recvTrain.len;// 获取数据长度
+    int data;// 用于临时存储数据
+
+    // 从套接字中接收实际的数据，并存储在 data 中
+    if(recv(sockfd, &data, left, 0) < 0)//sockfd->data
     {
         cout << "-------Error: Receive failed!-------" << endl;
     }
-    recvTrain.data.append(reinterpret_cast<char*>(&data), sizeof(data));
+    //reinterpret_cast 被用来将一个整数指针&data转换为字符指针char*
+    recvTrain.data.append(reinterpret_cast<char*>(&data), sizeof(data));//string类的append
+    //这里的string类的append方法用于将data变量的二进制内容追加到 recvTrain.data 字符串的末尾
 }
 
 void getNameAndPasswd(std::string& name, std::string& passwd)//用户输入用户名和密码

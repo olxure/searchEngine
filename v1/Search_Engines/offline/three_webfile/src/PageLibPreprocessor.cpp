@@ -1,6 +1,6 @@
 #include "../include/PageLibPreprocessor.h"
 
-// 曾泽文：将v_webpage去重
+// 将v_webpage去重
 void PageLibPreprocessor::cutRedundantPages()
 {
     simhash::Simhasher simhasher("../include/cppjieba/dict/jieba.dict.utf8",
