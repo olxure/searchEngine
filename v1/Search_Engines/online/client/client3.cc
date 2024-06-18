@@ -362,34 +362,35 @@ void runSearch(size_t sockfd, string& name) {//用户进入搜索循环
             using std::endl;
             size_t buffer_size = sizeof(t1.len) + sizeof(t1.id) + t1.data.length();//将输入的信息转换成字符流进行发送
             
-            /* cout << "buffer_size: " << buffer_size << endl; */
+            cout << "buffer_size: " << buffer_size << endl;//test
 
             char* buffer = new char[buffer_size + 1]();
             std::memcpy(buffer, &t1.len, sizeof(t1.len));
 
-            /* cout << "buffer_ti.len: " << *(int*)buffer << endl; */
+            cout << "buffer_ti.len: " << *(int*)buffer << endl;//test
 
             std::memcpy(buffer + sizeof(t1.len), &t1.id, sizeof(t1.id));
 
-            /* cout << "buffer_t1.id: " << *(int*)(buffer+4) << endl; */
+            cout << "buffer_t1.id: " << *(int*)(buffer+4) << endl;//test
 
             std::memcpy(buffer + sizeof(t1.len) + sizeof(t1.id), t1.data.c_str(), t1.data.length());
 
-            /* cout << "buffer_t1.data: " << (buffer + 8) << endl; */
+            cout << "buffer_t1.data: " << (buffer + 8) << endl;//test
 
             buffer[buffer_size] = '\n';
 
             // 发送字节流
-            if (send(sockfd, buffer, buffer_size + 1, 0) < 0) {
+            if (send(sockfd, buffer, buffer_size + 1, 0) < 0) {//sockfd <- buffer
                 std::cout << "-------Error: Send failed!-------" << std::endl;
                 continue;
             }
 
             delete[] buffer;//释放空间
 
-            int len = 0;
-            recv(sockfd, &len, sizeof(len), 0);
-            char buf[len];
+            int len = 0;//接收缓冲区的指针，表示将接收到的数据存储到len变量中，用于接收即将到来的消息数据的长度
+            recv(sockfd, &len, sizeof(len), 0);//sockfd -> buffer等于sockfd -> len
+            cout << "len:" << len << endl;//测试接收的消息的长度是否一直为0
+            char buf[len];//len为即将接收消息的长度
             memset(buf, 0, sizeof(buf));
             recv(sockfd, buf, len, 0);//接收服务端返回信息
             std::string Jsonstring(buf,len);
@@ -431,7 +432,7 @@ void runSearch(size_t sockfd, string& name) {//用户进入搜索循环
 
             // 转换为字节流
             size_t buffer_size = sizeof(t1.len) + sizeof(t1.id) + t1.data.length();
-            char* buffer = new char[buffer_size+1]();//将数据打包字符流尽心发送
+            char* buffer = new char[buffer_size+1]();//将数据打包字符流尽情发送
             std::memcpy(buffer, &t1.len, sizeof(t1.len));
             std::memcpy(buffer + sizeof(t1.len), &t1.id, sizeof(t1.id));
             std::memcpy(buffer + sizeof(t1.len) + sizeof(t1.id), t1.data.c_str(), t1.data.length());

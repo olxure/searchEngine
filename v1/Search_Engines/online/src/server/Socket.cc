@@ -34,6 +34,7 @@ void Socket::shutDownWrite()
 {
     //关闭写端
     int ret = shutdown(_fd, SHUT_WR);
+    //SHUT_RD：关闭读端 ；  SHUT_WR：关闭写端；  SHUT_RDWR：同时关闭读端和写端。
     if(ret)
     {
         perror("shutdown");

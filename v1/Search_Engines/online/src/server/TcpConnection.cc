@@ -25,7 +25,12 @@ TcpConnection::~TcpConnection()
 
 void TcpConnection::send(const string& msg)
 {
-    _sockIO.writen(msg.c_str(), msg.size());
+    int len = msg.size();//test
+    _sockIO.writen(reinterpret_cast<const char*>(&len), sizeof(len)); // 发送数据长度//test
+    _sockIO.writen(msg.c_str(), len); // 发送实际数据
+
+    //标准库中的write函数不能保证一次性将所有数据写完，自定义writen通常是用来解决这个问题的。
+    // _sockIO.writen(msg.c_str(), msg.size());//有点问题暂存
 }
 
 //将msg发送给EventLoop，然后让EventLoop将数据发送给客户端
