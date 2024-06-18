@@ -18,9 +18,9 @@ int main()
     //创建词典
     dict.createDict();
     //将词典保存到文件
-    dict.storeDict("chi_dict.txt");
+    dict.storeDict("chi_dict.dat");
     //将索引保存到文件
-    dict.storeIndex("chi_index.txt");
+    dict.storeIndex("chi_index.dat");
     return 0;
 }
 

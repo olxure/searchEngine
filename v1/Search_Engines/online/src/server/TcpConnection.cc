@@ -15,7 +15,9 @@ TcpConnection::TcpConnection(int fd, EventLoop *loop)
 , _localAddr(getLocalAddr())
 , _peerAddr(getPeerAddr())
 {
-
+    std::cout << "TcpConnection initialized with fd: " << fd << std::endl;//测试用
+    std::cout << "Local address: " << _localAddr.ip() << ":" << _localAddr.port() << std::endl;//测试用
+    std::cout << "Peer address: " << _peerAddr.ip() << ":" << _peerAddr.port() << std::endl;//测试用
 }
 
 TcpConnection::~TcpConnection()
@@ -25,12 +27,12 @@ TcpConnection::~TcpConnection()
 
 void TcpConnection::send(const string& msg)
 {
-    int len = msg.size();//test
-    _sockIO.writen(reinterpret_cast<const char*>(&len), sizeof(len)); // 发送数据长度//test
-    _sockIO.writen(msg.c_str(), len); // 发送实际数据
+    // int len = msg.size();//test
+    // _sockIO.writen(reinterpret_cast<const char*>(&len), sizeof(len)); // 发送数据长度//test
+    // _sockIO.writen(msg.c_str(), len); // 发送实际数据
 
     //标准库中的write函数不能保证一次性将所有数据写完，自定义writen通常是用来解决这个问题的。
-    // _sockIO.writen(msg.c_str(), msg.size());//有点问题暂存
+    _sockIO.writen(msg.c_str(), msg.size());//有点问题暂存
 }
 
 //将msg发送给EventLoop，然后让EventLoop将数据发送给客户端
@@ -56,13 +58,15 @@ char* TcpConnection::receive()
 
 string TcpConnection::toString()
 {
-    ostringstream oss;
-    oss << _localAddr.ip() << ":"
-        << _localAddr.port() << "---->"
-        << _peerAddr.ip() << ":"
-        << _peerAddr.port();
+    //输出字符串流，用于将数据写入一个字符串中
+    //类似cout，只不过数据被写入到一个字符串而不是控制台
+    ostringstream oss;//oss <-- ip port 
+    oss << _localAddr.ip() << ":"       // 将本地IP地址写入流
+        << _localAddr.port() << "---->" // 将本地端口写入流，后跟一个箭头
+        << _peerAddr.ip() << ":"        // 将对端IP地址写入流
+        << _peerAddr.port();            // 将对端端口写入流
 
-    return oss.str();
+    return oss.str();// 获取流中的字符串内容,也就是上面流入到oss的ip和port之类的
 }
 
 //判断连接是否断开了

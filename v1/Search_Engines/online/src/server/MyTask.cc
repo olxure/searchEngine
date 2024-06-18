@@ -11,24 +11,27 @@ using std::shared_ptr;
 
 void MyTask::signUp(string name, string passwd)
 {
-    cout << "rece name: " << name << endl;
+    cout << "recv name: " << name << endl;
     cout << "recv passwd: " << passwd << endl;
-    // 计算盐值
-    srand((unsigned)time(NULL));
-    char* salt;
+    // 
+    srand((unsigned)time(NULL));// 生成盐值
+    char* salt;//暂存
     salt = genRandomString(SALT_LENGTH);
 
-    cout << salt << endl;
+    cout << "Generated salt: " << salt << endl; // 增加日志输出，测试盐值是否正确
+    //cout << salt << endl;//暂存
     MYSQL* mysql =  mysql_init(NULL);
-    MYSQL* Mret = mysql_real_connect(mysql, "localhost", "root", "mysql123", "client"
-                                     , 0, NULL, 0);     // 连接数据库
+    MYSQL* Mret = mysql_real_connect(mysql, "localhost", "root", "mysql123", "client", 0, NULL, 0);     // 连接数据库
     if(Mret == NULL){
         fprintf(stderr, "%s\n", mysql_error(mysql));
     }
 
     int ret;
     // 连接上数据库后开始执行插入语句
-    char* crypted;
+    //char* crypted;//暂存
+    char* crypted = crypt(passwd.c_str(), salt);    // 加密密码，测试用
+    cout << "Encrypted password: " << crypted << endl; // 增加日志输出，测试用
+
     char sql[4096];
     bzero(sql, sizeof(sql));
     crypted = crypt(passwd.c_str(), salt);    // 加密密码
@@ -71,7 +74,10 @@ int MyTask::login(string name, string password)
         return -1;      // 没找到
     }
     string salt(row[2]);
-    string passwd(row[3]);
+    string passwd(row[3]);//暂存
+    //string stored_passwd(row[3]);//测试
+    cout << "Retrieved salt: " << salt << ", stored password: " << passwd << endl; // 增加日志输出，测试盐值用
+
     char* crypted = crypt(password.c_str(), salt.c_str());
     if(passwd == string(crypted))
     {
@@ -81,6 +87,7 @@ int MyTask::login(string name, string password)
     }
     else
     {
+        cout << "Password mismatch. Stored: " << passwd << ", Input: " << crypted << endl; // 增加日志输出，测试盐值
         return -2;
     }
 }
@@ -89,33 +96,36 @@ char* MyTask::genRandomString(int length)       // 得到随机盐值
 {
     int flag, i;
     char* string;
-    if ((string = (char*) malloc(length)) == NULL )
+    // 动态分配内存来存储生成的随机字符串，如果分配失败则返回 NULL
+    //if ((string = (char*) malloc(length)) == NULL )//暂存 // 分配长度为 length 的内存
+    if ((string = (char*) malloc(length + 1)) == NULL )// 分配长度为 length + 1 的内存，包含终止符，测试用
     {
         printf("Malloc failed!flag:14\n");
-        return NULL ;
+        return NULL ;// 返回 NULL 表示分配失败
     }
-    for (i = 0; i < length+1; i++)
+    for (i = 0; i < length; i++)// 循环生成每个字符，测试
+    //for (i = 0; i < length+1; i++)// 循环生成每个字符，暂存
     {
-        flag = rand() % 3;
+        flag = rand() % 3;// 生成 0 到 2 的随机数，决定字符类型
         switch (flag)
         {
         case 0:
-            string[i] = 'A' + rand() % 26;
+            string[i] = 'A' + rand() % 26;// 生成大写字母
             break;
         case 1:
-            string[i] = 'a' + rand() % 26;
+            string[i] = 'a' + rand() % 26;// 生成小写字母
         	break;
         case 2:
-            string[i] = '0' + rand() % 10;
+            string[i] = '0' + rand() % 10;// 生成数字
             break;
         default:
-            string[i] = 'x';
+            string[i] = 'x';// 出现异常时生成字符 'x'
             break;
         }
-    }
-    string[length] = '\0';
-    return string;
-}
+    }//for循环结束
+    string[length] = '\0';// 在字符串末尾添加空字符，表示字符串结束
+    return string;// 返回生成的随机字符串
+}//char* MyTask::genRandomString(int length)结束
 
 // json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg) {
 //     json j;
@@ -164,38 +174,38 @@ char* MyTask::genRandomString(int length)       // 得到随机盐值
 json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg)
 {
     // 网页搜索
-    json j;
-    MyRedis* redis = MyRedis::getInstance(conf);
-    string redisResult = redis->get(usrMsg);
-    if(redisResult == string())
+    json j;// 用于存储搜索结果的 JSON 对象
+    MyRedis* redis = MyRedis::getInstance(conf);// 获取 Redis 实例
+    string redisResult = redis->get(usrMsg);// 从 Redis 缓存中获取用户消息的搜索结果
+    if(redisResult == string()) // 如果缓存中没有找到结果
     {
         // 缓存中没找到就走库搜索
-        WebPageQuery WebQuery(conf);
+        WebPageQuery WebQuery(conf);// 创建 WebPageQuery 对象
 
-        SplitToolCppJieba* pSplit = SplitToolCppJieba::getInstance(conf);
+        SplitToolCppJieba* pSplit = SplitToolCppJieba::getInstance(conf);// 获取分词工具实例
 
         // 用户的消息进行分词
-        WebPageSearcher wps(usrMsg, *pSplit);
-        vector<string> wordList = wps.getWordList();
+        WebPageSearcher wps(usrMsg, *pSplit);// 创建 WebPageSearcher 对象，传入用户消息和分词工具
+        vector<string> wordList = wps.getWordList();// 获取分词后的单词列表
 
-        WebQuery.doQuery(wordList);
+        WebQuery.doQuery(wordList);// 执行查询
 
-        WebQuery.handleAbstract();
+        WebQuery.handleAbstract();// 处理摘要
 
         cout << "================" << endl;
-        WebQuery.generateJson();
-        j = WebQuery.getResult();
+        WebQuery.generateJson();// 生成 JSON 结果
+        j = WebQuery.getResult();// 获取 JSON 结果
         // 把记录存储到redis中
         redis->set(usrMsg, j.dump());
     }
-    else
+    else// 如果缓存中找到结果
     {
         // 找到直接返回
-        j = json::parse(redisResult);    
+        j = json::parse(redisResult);// 解析 JSON 结果    
     }
-    pushHistory(name, usrMsg);
-    return j;
-}
+    pushHistory(name, usrMsg);// 记录搜索历史
+    return j;// 返回 JSON 结果
+}//json MyTask::webSearch(Configuration* conf, string& name, string& usrMsg)结束
 
 string MyTask::getUserHistoryJSON(const string& str){
     std::string json;

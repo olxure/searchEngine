@@ -22,13 +22,13 @@ class TcpConnection
 public:
     explicit TcpConnection(int fd, EventLoop *loop);
     ~TcpConnection();
-    void send(const string &msg);
-    void sendInLoop(const string& msg);//让msg在EventLoop发送
-    char* receive();
-    //为了方便调试的函数
-    string toString();
-    //判断连接是否断开了
-    bool isClosed() const;
+    void send(const string &msg);// 发送消息
+    void sendInLoop(const string& msg);//让msg在EventLoop发送 // 在事件循环中发送消息
+    char* receive(); // 接收消息
+    
+    string toString();// 生成描述TCP连接的字符串（调试用）
+    
+    bool isClosed() const;// 判断连接是否已断开
     
     //在TcpConnection中需要注册三个回调函数
     void setNewConnectionCallback(const TcpConnectionCallback &cb);
@@ -37,15 +37,14 @@ public:
     void setTimeoutCallback(const TcpConnectionCallback &cb);
 
     //执行对应的三个回调函数
-    void handleNewConnectionCallback();
-    void handleMessageCallback();
-    void handleCloseCallback();
-    void handleTimeOutCallback();
+    void handleNewConnectionCallback();// 新连接回调
+    void handleMessageCallback();// 消息回调
+    void handleCloseCallback();// 连接关闭回调
+    void handleTimeOutCallback();// 超时回调
 
 private:
-    //获取本端地址与对端地址
-    InetAddress getLocalAddr();
-    InetAddress getPeerAddr();
+    InetAddress getLocalAddr();// 获取本地地址
+    InetAddress getPeerAddr();// 获取对端地址
 
 private:
     EventLoop *_loop;//让TcpConnection知道EventLoop的存在
@@ -53,8 +52,8 @@ private:
 
     //为了调试而加入的函数
     Socket _sock;
-    InetAddress _localAddr;
-    InetAddress _peerAddr;
+    InetAddress _localAddr;//两个包含IP和端口等的结构体
+    InetAddress _peerAddr;//两个包含IP和端口等的结构体
 
     TcpConnectionCallback _onConnectionCb;//1、连接建立
     TcpConnectionCallback _onMessageCb;//2、消息到达

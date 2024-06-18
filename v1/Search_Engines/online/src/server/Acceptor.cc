@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Acceptor.h"
 #include <stdio.h>
 
@@ -59,14 +60,15 @@ void Acceptor::setReusePort()
 // 绑定IP和端口
 void Acceptor::bind()
 {
-    int ret = ::bind(_sock.fd(), 
-                     (struct sockaddr *)_addr.getInetAddrPtr(),
-                     sizeof(struct sockaddr));
+    int ret = ::bind(_sock.fd(), (struct sockaddr *)&_addr, sizeof(struct sockaddr));
+    //int ret = ::bind(_sock.fd(), (struct sockaddr *)_addr.getInetAddrPtr(),sizeof(struct sockaddr));//可能有点问题暂存
     if(-1 == ret)
     {
         perror("bind");
+        std::cerr << "Failed to bind socket with fd: " << _sock.fd() << std::endl;
         return;
     }
+    std::cerr << "Socket bound successfully with fd: " << _sock.fd() << std::endl;
 }
 
 // 开始监听
@@ -76,8 +78,10 @@ void Acceptor::listen()
     if(-1 == ret)
     {
         perror("listen");
+        std::cerr << "Failed to listen on socket with fd: " << _sock.fd() << std::endl;
         return;
     }
+    std::cerr << "Socket is now listening with fd: " << _sock.fd() << std::endl;
 }
 
 // 接受新的连接
@@ -87,11 +91,13 @@ int Acceptor::accept()
     //而不是类的成员函数或其他命名空间中的函数
     int connfd = ::accept(_sock.fd(), nullptr, nullptr);
     //_sock.fd()：调用 Socket 类的 fd 方法，返回套接字文件描述符。
-    if(-1 == connfd)
+    //if(-1 == connfd)//有点问题暂存
+    if (connfd < 0)
     {
         perror("accept");
         return -1;
     }
+    std::cout << "Accepted connection with fd: " << connfd << std::endl;//测试fd
     return connfd;// 返回新连接的文件描述符
 }
 

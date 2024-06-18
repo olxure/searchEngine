@@ -45,8 +45,7 @@ struct std::greater<webPriority>
     }
 };
 
-class WebLib
-:public NonCopyable
+class WebLib:public NonCopyable
 {
 public:
     static WebLib* getInstance(Configuration* conf);

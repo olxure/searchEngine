@@ -4,8 +4,7 @@
 #include "NonCopyable.h"
 
 // Socket类，继承自NonCopyable
-class Socket
-: NonCopyable
+class Socket: NonCopyable
 {
 public:
     Socket();// 默认构造函数

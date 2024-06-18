@@ -113,28 +113,28 @@ void MyRedis::set(string key, string value)
 // 返回nullptr说明没有这个数据
 string MyRedis::get(string key)
 {
-    _pReply = (redisReply*)redisCommand(_pConnect, "GET %s",
-                                        key.c_str());
-    if(_pReply)
+    // 发送 GET 命令到 Redis 服务器，并获取键对应的值
+    _pReply = (redisReply*)redisCommand(_pConnect, "GET %s",key.c_str());
+    if(_pReply)// 检查命令回复
     {
-        if(_pReply->type == REDIS_REPLY_STRING)
+        if(_pReply->type == REDIS_REPLY_STRING)// 检查回复类型是否为字符串
         {
-            string str = _pReply->str;
+            string str = _pReply->str;// 将回复的字符串值转换为 std::string
 
-            freeReplyObject(_pReply);
+            freeReplyObject(_pReply);// 释放回复对象并置为空
             _pReply = nullptr;
 
-            return str;
+            return str;// 返回字符串值
         }
         else
         {
-            freeReplyObject(_pReply);
+            freeReplyObject(_pReply);// 释放回复对象并返回空字符串
             return string();
         }
     }
     else
     {
-        return string();
+        return string();// 命令执行失败，返回空字符串
     }
 }
 
