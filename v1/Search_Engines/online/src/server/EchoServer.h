@@ -35,10 +35,10 @@ public:
 
     void start()
     {
-        _pool.start();
-        Configuration* conf = Configuration::getInstance(_confPath);
-        map<string, string> configMap = conf->getConfigMap();
-        for(auto& elem : configMap)
+        _pool.start();// 启动线程池
+        Configuration* conf = Configuration::getInstance(_confPath);// 获取配置实例
+        map<string, string> configMap = conf->getConfigMap();// 获取配置文件中的配置信息
+        for(auto& elem : configMap)// 初始化缓存管理器
         {
             if(elem.first == "cache_data.dat")
             {
@@ -48,12 +48,13 @@ public:
         /* _server.setAllCallback(std::move(onNewConnection) */
         /*                        , std::move(onMessage) */
         /*                        , std::move(onClose)); */
+        //// 使用 std::bind 绑定回调函数到服务器
         using namespace std::placeholders;
         _server.setAllCallback(std::bind(&EchoServer::onNewConnection, this, _1)
                                , std::bind(&EchoServer::onMessage, this, _1, _confPath)
                                , std::bind(&EchoServer::onClose, this, _1)
                                , std::bind(&EchoServer::onTimeout, this, _1));
-        _server.start();
+        _server.start();// 启动服务器
     }
     void stop()
     {

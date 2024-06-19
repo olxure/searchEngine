@@ -15,9 +15,10 @@ namespace current_thread {
 
 class Thread
 {
-    using ThreadCallback = function<void()>;
+    using ThreadCallback = function<void()>;//设置线程回调函数的快速命名声明变量方式
 public:
-    Thread(ThreadCallback &&cb, const string & name = "wd thread");
+    //这是一个右值引用参数，类型为 ThreadCallback，它实际上是一个 std::function<void()> 类型的函数对象
+    Thread(ThreadCallback &&cb, const string & name = "olx thread");
     ~Thread();
 
     //线程运行与停止的函数
@@ -32,7 +33,7 @@ private:
     pthread_t _thid;//线程id
     string _name;
     bool _isRunning;//标识线程是否在运行
-    ThreadCallback _cb;//就是需要执行的任务
+    ThreadCallback _cb;//using Thread::ThreadCallback = std::function<void ()>
 
 };
 

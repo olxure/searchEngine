@@ -13,12 +13,13 @@ using std::function;
 
 class Thread;//前向声明
 
-using Task = function<void()>;
+//using：这是 C++11 引入的一种新语法，用来定义类型别名。它的功能类似于旧的 typedef 关键字，但在某些情况下更灵活和易读。
+using Task = function<void()>;//这是一个来自标准库的可调用对象包装器
 
 class ThreadPool
 {
 public:
-    ThreadPool(size_t threadNum, size_t queSize);
+    ThreadPool(size_t threadNum, size_t queSize);//构造函数
     ~ThreadPool();
 
     //线程池的启动与退出

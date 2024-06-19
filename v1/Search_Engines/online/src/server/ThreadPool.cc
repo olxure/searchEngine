@@ -1,12 +1,12 @@
 #include "Thread.h"
 #include "ThreadPool.h"
 #include <unistd.h>
-
+//第一个ThreadPool是类的名字，第二个是构造函数的名字，C++中构造函数名必须与类名一致
 ThreadPool::ThreadPool(size_t threadNum, size_t queSize)
 : _threadNum(threadNum)
 , _queSize(queSize)
 , _taskQue(_queSize)
-, _isExit(false)
+, _isExit(false)//先默认没有启动
 {
     _threads.reserve(_threadNum);
 }
