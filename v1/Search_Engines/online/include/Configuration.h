@@ -20,11 +20,12 @@ using std::istringstream;
 using std::bind;
 using std::function;
 
-// 单例类
-class Configuration
-:public NonCopyable
+// 单例类,单例模式（Singleton Pattern）是一种设计模式，它确保一个类只有一个实例，并提供一个全局访问点
+class Configuration:public NonCopyable
 {
 public:
+    //返回类型是 Configuration*。static 关键字是修饰 getInstance 方法的，而不是修饰返回类型
+    //static 的作用是表明 getInstance 是一个静态方法，可以通过类名直接调用，而不需要创建类的实例
     static Configuration* getInstance(const string& filepath)
     {
         // 为了防止多次bind
@@ -106,7 +107,7 @@ private:
     static void init(){
         _initFunc();
         atexit(destroy);
-    }
+    }//function<void()> Configuration::_initFunc;
 
     static void setFilepath(const string& filepath)
     {
@@ -125,7 +126,7 @@ private:
 
 private:
     static Configuration* _pInstance;
-    static pthread_once_t _once;
+    static pthread_once_t _once;//typedef int pthread_once_t，就是int _once
     static function<void()> _initFunc;       //init内部使用的回调函数
 
     string _filepath; // 配置文件路径

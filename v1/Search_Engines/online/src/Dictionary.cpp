@@ -1,5 +1,5 @@
 #include "../include/Dictionary.h"
-
+// 获取单例实例
 Dictionary* Dictionary::getInstance(Configuration* conf){
     if(m_dictionary==nullptr){
         std::unique_lock<std::mutex> lock(m_Mutex);//实现单例类线程安全
@@ -27,15 +27,17 @@ Dictionary* Dictionary::getInstance(Configuration* conf){
                     m_dictionary->initIndexEn(elem.second);
                 }
             }
-            /* m_dictionary->initDictCh("/home/lihaha/wd_project/Search_Engines/online/data/chi_dict.dat"); */
-            /* m_dictionary->initIndexEn("/home/lihaha/wd_project/Search_Engines/online/data/eng_index.dat"); */
-            /* m_dictionary->initDictEn("/home/lihaha/wd_project/Search_Engines/online/data/eng_dict.dat"); */
-            /* m_dictionary->initIndexCh("/home/lihaha/wd_project/Search_Engines/online/data/chi_index.dat"); */
+            /* m_dictionary->initDictCh("/home/lexu/olx_project/Search_Engines/online/data/chi_dict.dat"); */
+            /* m_dictionary->initIndexEn("/home/lexu/olx_project/Search_Engines/online/data/eng_index.dat"); */
+            /* m_dictionary->initDictEn("/home/lexu/olx_project/Search_Engines/online/data/eng_dict.dat"); */
+            /* m_dictionary->initIndexCh("/home/lexu/olx_project/Search_Engines/online/data/chi_index.dat"); */
 
         }
     }
     return m_dictionary;
 }
+
+// 删除单例实例
 void Dictionary::deleteInstance(){
     std::unique_lock<std::mutex> lock(m_Mutex);
     if(m_dictionary){
@@ -43,10 +45,12 @@ void Dictionary::deleteInstance(){
         m_dictionary=nullptr;
     }
 }
-Dictionary *Dictionary::m_dictionary = nullptr;
+
+// 静态成员初始化
+Dictionary *Dictionary::m_dictionary = nullptr;//m_dictionary是一个指向Dictionary类的指针
 std::mutex Dictionary::m_Mutex;
 
-
+// 初始化中文词典
 void Dictionary::initDictCh(const string &dictPathCh){
     ifstream ifs(dictPathCh);
     if(!ifs){
@@ -66,6 +70,8 @@ void Dictionary::initDictCh(const string &dictPathCh){
         }
     }
 }
+
+// 初始化英文词典
 void Dictionary::initDictEn(const string &dictPathEn){
     ifstream ifs(dictPathEn);
     if(!ifs){
@@ -86,6 +92,7 @@ void Dictionary::initDictEn(const string &dictPathEn){
     }
 }
 
+// 初始化中文索引
 void Dictionary::initIndexCh(const string &indexPathCh){
     ifstream ifs(indexPathCh);
     if(!ifs){
@@ -104,6 +111,8 @@ void Dictionary::initIndexCh(const string &indexPathCh){
         }
     }
 }
+
+// 初始化英文索引
 void Dictionary::initIndexEn(const string &indexPathEn){
     ifstream ifs(indexPathEn);
     if(!ifs){
@@ -123,13 +132,14 @@ void Dictionary::initIndexEn(const string &indexPathEn){
     }
 }
 
-vector<pair<string,int>>& Dictionary::getDictCh(){return _dictCh;}
-vector<pair<string,int>>& Dictionary::getDictEn(){return _dictEn;}
+vector<pair<string,int>>& Dictionary::getDictCh(){return _dictCh;}// 获取中文词典
+vector<pair<string,int>>& Dictionary::getDictEn(){return _dictEn;}// 获取英文词典
 
-map<string,set<int>>& Dictionary::getIndexCh(){return _indexCh;}
-map<string,set<int>>& Dictionary::getIndexEn(){return _indexEn;}
+map<string,set<int>>& Dictionary::getIndexCh(){return _indexCh;}// 获取中文索引
+map<string,set<int>>& Dictionary::getIndexEn(){return _indexEn;}// 获取英文索引
 //vector<pair<string,int>>& Dictionary::getFinRes(){return _RecWord;} 
 
+// 查找词语出现的行号
 set<int> Dictionary::findWord(const string& ch,map<string,set<int>> _index){
     set<int> lineNumbers;
 
@@ -164,6 +174,7 @@ void Dictionary::CutWord(const string words, vector<string> &wordset)
   return ;
 }
 
+// 进行与查询
 vector<pair<string,int>>& Dictionary::doAndQuery(const string & str){
 //void Dictionary::doAndQuery(const string & str){
     set<int> finResCh;
@@ -206,7 +217,8 @@ vector<pair<string,int>>& Dictionary::doAndQuery(const string & str){
     
     return _RecWord;
 }
-    
+
+ // 判断是否为中文   
 bool Dictionary::isChinese(const string& word){
     if ((word[0] & 0xf8) == 0xf0)
       return true;
@@ -218,6 +230,7 @@ bool Dictionary::isChinese(const string& word){
     return false;
 }
 
+// 判断是否为英文
 bool Dictionary::isEnglish(const string& word){
     char ch = word[0];
     if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
